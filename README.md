@@ -1,5 +1,4 @@
 # 🎙️😜 SarcEmotiq
-📌 **DOI:** [10.1121/2.0001918](https://doi.org/10.1121/2.0001918)
 ![License](https://img.shields.io/badge/license-CC%20BY--NC%204.0-blue)
 ![Python](https://img.shields.io/badge/python-3.10-green)
 ![Paper](https://img.shields.io/badge/paper-JASA%202024-red)
