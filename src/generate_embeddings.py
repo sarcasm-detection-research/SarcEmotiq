@@ -176,7 +176,7 @@ def process_directory(audio_directory, text_csv, output_directory):
 
         print(f"All embeddings have been processed and saved to {embedding_file_path}")  # Final feedback
 
-
+"""
 def check_h5_contents(file_path):
     with h5py.File(file_path, 'r') as f:
         def print_group(name, obj):
@@ -186,7 +186,7 @@ def check_h5_contents(file_path):
                 print(f"Dataset: {name}, Shape: {obj.shape}, Dtype: {obj.dtype}")
 
         f.visititems(print_group)
-
+"""
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate embeddings for text, audio, sentiment, and emotion.")

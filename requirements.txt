@@ -6,3 +6,5 @@ scikit_learn==1.5.2
 torch==2.2.2
 torchaudio==2.2.2
 transformers==4.39.3
+gradio==3.39.0
+soundfile==0.12.1

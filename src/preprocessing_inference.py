@@ -78,7 +78,7 @@ def get_emotion(audio_file_path):
     model = AutoModelForAudioClassification.from_pretrained(model_name, config=config)
     feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained("facebook/wav2vec2-large-xlsr-53")
 
-    waveform, sample_rate = torchaudio.load(audio_file_path)
+    waveform, sample_rate = torchaudio.load(audio_file_path, backend="soundfile")
 
     if waveform.shape[0] > 1:  # Handle multiple channels -- average across channels
         waveform = torch.mean(waveform, dim=0)

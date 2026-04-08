@@ -1,0 +1,6 @@
+model_path: "models/model.pth"
+sample_rate: 16000
+opensmile_path: "src/opensmile"
+opensmile_config_path: "src/opensmile/config/compare16/ComParE_2016.conf"
+temporary_lld_path: "temp_lld.csv"
+demo_title: "SarcEmotiq Demo"

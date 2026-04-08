@@ -5,17 +5,19 @@
 
 SarcEmotiq is a deep learning-based tool for recognizing sarcasm in English audio. It uses pre-trained models trained on open-sourced datasets [MUStARD++](https://github.com/cfiltnlp/MUStARD_Plus_Plus) but also allows users to retrain the model with their own data.
 
+The pretrained checkpoint is publicly available. Training data is not public, so retraining requires preparing your own dataset.
+
 ## Model Architecture
-SarcEmotiq integrates multiple modalities, acoustic + textual + emotional + sentiment cues, into a unified attention-based fusion model. Below is a summary of the system.
+SarcEmotiq integrates multiple modalities — acoustic, textual, emotional, and sentiment cues — into a unified attention-based fusion model.
 
 ### Modalities Used:
 
 | Modality  | Feature source                                                       |
 |-----------|----------------------------------------------------------------------|
 | Audio     | openSMILE (ComParE_2016)                                             |
-| Text      | BERT-base-uncased                                                    |
+| Text      | Whisper transcription + BERT-base-uncased                            |
 | Emotion   | wav2vec2-large-xlsr → Speech emotion classifier                      |
-| Sentiment | RoBERTa (sentiment-roberta-large-english) Text sentiment classifier  |
+| Sentiment | RoBERTa (sentiment-roberta-large-english) → Text sentiment classifier|
 
 ### Fusion Mechanisms:
 1. **Contrastive attention**  
@@ -35,40 +37,77 @@ SarcEmotiq integrates multiple modalities, acoustic + textual + emotional + sent
 ## ⚡ Quick Start
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/SarcEmotiq.git
+   git clone https://github.com/sarcasm-detection-research/SarcEmotiq.git
    cd SarcEmotiq
    ```
 2. Set up the environment:
    ```bash
    python --version  # requires 3.10
-   python -m venv venv
-   source venv/bin/activate
+   python -m venv your_environment_name
+   source your_environment_name/bin/activate
    pip install -r requirements.txt
    ```
-3. Download the pretrained model (Place it in the `models/` folder)
+   ⚠️ This project uses OpenAI Whisper for automatic transcription during inference.
+   On some systems, installing `openai-whisper` from `requirements.txt` may fail. If that happens, install Whisper directly from GitHub instead:
    ```bash
-   wget <https://drive.google.com/file/d/1xqyofUELCl2oBlA6151Vvd-f8pIG2biF/view?usp=drive_link> -O models/model.pth
+   pip install git+https://github.com/openai/whisper.git
+   ```
+   
+   ### External dependencies
+   Inference and demo require:
+
+   - `ffmpeg`
+   - a platform-compatible OpenSMILE binary under `src/opensmile/`
+
+3. Download the pretrained model checkpoint and place it locally, for example at models/model.pth.
+   ```bash
+   [Checkpoint link](https://drive.google.com/file/d/1xqyofUELCl2oBlA6151Vvd-f8pIG2biF/view)
    ```
 4. Run inference
    ```bash
-   python src/inference.py --input path/to/data --model path/to/model
+   python src/predict.py --input path/to/audio.wav --model path/to/model.pth
    ```
-   ⚠️ Note: The audio file should be in .wav format, ranging from 1s to 20s. No need to include the contextual sentence. Check the example under /samples/.
+   ⚠️ Note: 
+   - Input audio should be in `.wav` format
+   - Recommended duration: 1s to 20s
+   - A transcript is not required for inference; it is generated automatically with Whisper
+   - Example audio files are available under `samples/`
+
+## Demo
+A local Gradio demo is included in `demo/app.py`.
+
+Run it with:
+```bash
+python -m demo.app
+```
 
 ## 📁 Repository Structure
-```bash
 
-sarcemotiq/
+```bash
+SarcEmotiq/
 ├── src/
-│   ├── inference.py       ← run prediction on audio
-│   ├── model.py           ← model architecture
-│   └── train.py           ← training loop
-├── models/                ← pretrained weights (download separately)
-├── samples/               ← example audio files
-└── data/                  ← place your dataset here
+│   ├── attention.py                 ← model architecture and fusion layers
+│   ├── dataload_train.py            ← training data loading and batching
+│   ├── preprocessing_inference.py   ← inference-time preprocessing helpers
+│   ├── generate_embeddings.py       ← generate multimodal embeddings for retraining
+│   ├── normalize.py                 ← normalize generated embeddings
+│   ├── inference.py                 ← legacy inference implementation
+│   ├── predict.py                   ← public inference wrapper
+│   ├── opensmile/                   ← bundled OpenSMILE tool and config
+│   └── train.py                     ← training loop
+├── demo/
+│   ├── __init__.py
+│   └── app.py                       ← Gradio demo
+├── scripts/
+│   ├── train_model.py               ← wrapper for src.train
+│   └── run_inference.py             ← wrapper for src.predict
+├── samples/                         ← example audio files
+├── config.yaml                      ← minimal runtime configuration
+├── requirements.txt
+├── README.md
+└── LICENSE
 ```
 ## Input Requirements
-The input audio and associated text should meet the following criteria:
 
 ### Audio
 - **Format**: WAV (.wav)
@@ -118,12 +157,11 @@ Example directory:
     --text_csv /path/to/text.csv \  #Path to the CSV file containing the audio file keys and text, sample: "/data/mustard++_onlyU.csv"
     --output_directory /path/to/store/tmp_audio_features  #Directory where the temporary extracted audio feature files (LLDs) will be stored and removed after processing.
    ```
-✅ Extracted embeddings for 1200 files → saved to /path/output/
+✅ This generates multimodal embeddings for audio, text, sentiment, emotion, and labels.
 
 ### Step 3: Normalize feature embeddings
-Once the embeddings (audio, text, sentiment, and emotion) are extracted, you can normalize them using the following command:
-   ```
-   python normalize_embeddings.py --embeddings path/to/embeddings.h5 --output_dir path/to/output_directory
+   ```bash
+   python normalize.py --embeddings path/to/embeddings.h5 --output_dir path/to/output_directory
    ```
    This will generate four normalized files:
     - normalized_audio.h5
@@ -137,7 +175,7 @@ Once the embeddings (audio, text, sentiment, and emotion) are extracted, you can
 When the normalized embeddings are generated, you can use the following command to train the model.
 The default path for normalized embedding files are under data/.
    ```bash
-   python train.py --data path/to/data --epochs 20 --batch_size 32 --model_path ./models/model.pth --patience 5 --lr 0.001
+   python src/train.py --data path/to/data --epochs 20 --batch_size 32 --model_path ./models/model.pth --patience 5 --lr 0.001
    ```
    You can adjust the following parameters to your needs.
    ```bash
@@ -149,9 +187,6 @@ The default path for normalized embedding files are under data/.
    - lr: Learning rate for the optimizer (default is 0.001).
    ```
    - The script will output training progress, including the loss on the training and validation sets. The best model will be saved at the specified model path.
-
-   - The training process includes early stopping based on validation loss. If the model doesn't improve for patience number of epochs, training will stop early.
-
 
 ## Limitations
 While SarcEmotiq shows commendable performance on benchmark data (74% F1-score) for binary sarcasm detection, users should be aware of its current limitations:

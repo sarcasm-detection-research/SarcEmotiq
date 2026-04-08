@@ -1,9 +1,9 @@
 import argparse
 import torch
 from torch import nn
-from dataload import transcribe_audio_whisper, extract_audio_features, get_bert_sequential_embeddings, get_emotion, \
+from src.preprocessing_inference import transcribe_audio_whisper, extract_audio_features, get_bert_sequential_embeddings, get_emotion, \
     get_sentiment, normalize_embeddings
-from attention import load_model
+from src.attention import load_model
 
 
 class AudioDimensionRegulator(nn.Module):
@@ -17,7 +17,7 @@ class AudioDimensionRegulator(nn.Module):
 
 class SarcasmRecognize():
     def __init__(self, model_path):
-        self.opensmile_path = '/opensmile'
+        self.opensmile_path = 'src/opensmile'
         self.config_path = f"{self.opensmile_path}/config/compare16/ComParE_2016.conf"
         self.LLD_path = "temp_lld.csv"
         self.model_path = model_path  # Use the model path passed during initialization
