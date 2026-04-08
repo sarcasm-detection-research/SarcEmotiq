@@ -4,8 +4,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
-from attention import SarcasmDetectionModel
-from dataload_train import create_dataloader
+from src.attention import SarcasmDetectionModel
+from src.dataload_train import create_dataloader
 from tqdm import tqdm
 import logging
 

@@ -3,11 +3,12 @@ import h5py
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 
-
+"""
 def normalize_embeddings(embeddings):
     scaler = StandardScaler()
     normalized_embeddings = scaler.fit_transform(embeddings)
     return normalized_embeddings
+"""
 
 
 def process_file(file_path, group_name, output_path):
