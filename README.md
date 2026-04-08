@@ -1,5 +1,8 @@
 # 🎙️😜 SarcEmotiq
 📌 **DOI:** [10.1121/2.0001918](https://doi.org/10.1121/2.0001918)
+![License](https://img.shields.io/badge/license-CC%20BY--NC%204.0-blue)
+![Python](https://img.shields.io/badge/python-3.10-green)
+![Paper](https://img.shields.io/badge/paper-JASA%202024-red)
 
 SarcEmotiq is a deep learning-based tool for recognizing sarcasm in English audio. It uses pre-trained models trained on open-sourced datasets [MUStARD++](https://github.com/cfiltnlp/MUStARD_Plus_Plus) but also allows users to retrain the model with their own data.
 
@@ -28,10 +31,9 @@ SarcEmotiq integrates multiple modalities, acoustic + textual + emotional + sent
 4. **Multimodal concatenation + MLP**  
    Pooled outputs (text, audio, sentiment, emotion, cross, contrastive) are concatenated and passed through an MLP for final classification.
 
-➡️ More information about the model please visit our [published paper] (https://doi.org/10.1121/2.0001918)
+➡️ More information about the model please visit our [published paper](https://doi.org/10.1121/2.0001918)
 
-
-## Installation
+## ⚡ Quick Start
 1. Clone the repository:
    ```bash
    git clone https://github.com/yourusername/SarcEmotiq.git
@@ -39,6 +41,9 @@ SarcEmotiq integrates multiple modalities, acoustic + textual + emotional + sent
    ```
 2. Set up the environment:
    ```bash
+   python --version  # requires 3.10
+   python -m venv venv
+   source venv/bin/activate
    pip install -r requirements.txt
    ```
 3. Download the pretrained model (Place it in the `models/` folder)
@@ -51,6 +56,15 @@ SarcEmotiq integrates multiple modalities, acoustic + textual + emotional + sent
    ```
    ⚠️ Note: The audio file should be in .wav format, ranging from 1s to 20s. No need to include the contextual sentence. Check the example under /samples/.
 
+## 📁 Repository Structure
+sarcemotiq/
+├── src/
+│   ├── inference.py       ← run prediction on audio
+│   ├── model.py           ← model architecture
+│   └── train.py           ← training loop
+├── models/                ← pretrained weights (download separately)
+├── samples/               ← example audio files
+└── data/                  ← place your dataset here
 
 ## Input Requirements
 The input audio and associated text should meet the following criteria:
@@ -65,7 +79,6 @@ The input audio and associated text should meet the following criteria:
 
 ### Transcription
 - For **inference**, the system will automatically transcribe audio using [Whisper](https://github.com/openai/whisper).
-
 
 ## Retrain the model
 You can retrain the model with your own dataset (audio + text).
@@ -104,6 +117,7 @@ Example directory:
     --text_csv /path/to/text.csv \  #Path to the CSV file containing the audio file keys and text, sample: "/data/mustard++_onlyU.csv"
     --output_directory /path/to/store/tmp_audio_features  #Directory where the temporary extracted audio feature files (LLDs) will be stored and removed after processing.
    ```
+✅ Extracted embeddings for 1200 files → saved to /path/output/
 
 ### Step 3: Normalize feature embeddings
 Once the embeddings (audio, text, sentiment, and emotion) are extracted, you can normalize them using the following command:
