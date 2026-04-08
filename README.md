@@ -56,6 +56,8 @@ SarcEmotiq integrates multiple modalities, acoustic + textual + emotional + sent
    ⚠️ Note: The audio file should be in .wav format, ranging from 1s to 20s. No need to include the contextual sentence. Check the example under /samples/.
 
 ## 📁 Repository Structure
+```bash
+
 sarcemotiq/
 ├── src/
 │   ├── inference.py       ← run prediction on audio
@@ -64,7 +66,7 @@ sarcemotiq/
 ├── models/                ← pretrained weights (download separately)
 ├── samples/               ← example audio files
 └── data/                  ← place your dataset here
-
+```
 ## Input Requirements
 The input audio and associated text should meet the following criteria:
 
